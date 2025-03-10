@@ -6,7 +6,7 @@ class ProfilePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Profile'),
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.deepPurpleAccent,
       ),
       body: ListView(
         padding: EdgeInsets.all(20),
@@ -35,7 +35,7 @@ class ProfilePage extends StatelessWidget {
         style: TextStyle(
           fontSize: 18,
           fontWeight: FontWeight.bold,
-          color: Colors.green,
+          color: Colors.deepPurpleAccent,
         ),
       ),
     );

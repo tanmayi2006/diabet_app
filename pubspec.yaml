@@ -23,7 +23,11 @@ dependencies:
   tflite_flutter: ^0.10.4
   pie_chart: ^5.4.0
   path_provider: ^2.1.1
+  
+  
 
+
+    
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -33,3 +37,17 @@ flutter:
   uses-material-design: true
   assets:
     - diabetes_model.tflite
+    - hairloss.jpg
+    - delayed_healing.jpg
+    - hungry.jpg
+    - itching.jpg
+    - muscle_stiffness.jpg
+    - obesity.jpg
+    - partialparesis.jpg
+    - thirst.jpg
+    - urine.jpg
+    - visualblur.jpg
+    - weakness.jpg
+    - weightloss.jpg
+    - genital.jpg
+    - irritate.jpg

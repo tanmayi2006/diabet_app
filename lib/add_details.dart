@@ -106,7 +106,7 @@ class _AddDetailsPageState extends State<AddDetailsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.deepPurple.shade800,
+        backgroundColor: Colors.deepPurpleAccent,
         title: Text('Add Details'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),

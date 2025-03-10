@@ -64,21 +64,38 @@ class _ClinicalDataPageState extends State<ClinicalDataPage> {
               Text("Select Symptoms:", style: _labelStyle()),
               Column(
                 children: symptoms.keys.map((String key) {
-                  return CheckboxListTile(
-                    title: Row(
-                      children: [
-                        _getSymptomIcon(key),
-                        SizedBox(width: 8),
-                        Text(key, style: TextStyle(color: Colors.black)),
-                      ],
-                    ),
-                    value: symptoms[key],
-                    onChanged: (bool? value) {
+                  return GestureDetector(
+                    onTap: () {
                       setState(() {
-                        symptoms[key] = value!;
+                        symptoms[key] = !symptoms[key]!;
                       });
                     },
-                    activeColor: Colors.greenAccent,
+                    child: Container(
+                      margin: EdgeInsets.symmetric(vertical: 5),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: symptoms[key]! ? Colors.green : Colors.grey,
+                          width: 2,
+                        ),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: CheckboxListTile(
+                        title: Row(
+                          children: [
+                            _getSymptomIcon(key),
+                            SizedBox(width: 8),
+                            Text(key, style: TextStyle(color: Colors.black)),
+                          ],
+                        ),
+                        value: symptoms[key],
+                        onChanged: (bool? value) {
+                          setState(() {
+                            symptoms[key] = value!;
+                          });
+                        },
+                        activeColor: Colors.greenAccent,
+                      ),
+                    ),
                   );
                 }).toList(),
               ),
@@ -176,35 +193,109 @@ class _ClinicalDataPageState extends State<ClinicalDataPage> {
   Widget _getSymptomIcon(String symptom) {
     switch (symptom) {
       case "Polyuria":
-        return Icon(Icons.water_drop, color: Colors.blueAccent);
+        return Image.asset(
+          'urine.jpg',
+          width: 80,
+          height: 80,
+          fit: BoxFit.contain,
+        );
       case "Polydipsia":
-        return Icon(Icons.local_drink, color: Colors.blueAccent);
+        return Image.asset(
+          'thirst.jpg',
+          width: 80,
+          height: 80,
+          fit: BoxFit.contain,
+        );
       case "Sudden Weight Loss":
-        return Icon(Icons.scale, color: Colors.orangeAccent);
+        return Image.asset(
+          'weightloss.jpg',
+          width: 65,
+          height: 65,
+          fit: BoxFit.contain,
+        );
       case "Weakness":
-        return Icon(Icons.battery_alert, color: Colors.redAccent);
+        return Image.asset(
+          'weakness.jpg',
+          width: 80,
+          height: 80,
+          fit: BoxFit.contain,
+        );
       case "Polyphagia":
-        return Icon(Icons.fastfood, color: Colors.greenAccent);
+        return Image.asset(
+          'hungry.jpg',
+          width: 80,
+          height: 80,
+          fit: BoxFit.contain,
+        );
       case "Genital Thrush":
-        return Icon(Icons.medical_services, color: Colors.purpleAccent);
+        return Image.asset(
+          'genital.jpg',
+          width: 70,
+          height: 70,
+          fit: BoxFit.contain,
+        );
       case "Visual Blurring":
-        return Icon(Icons.visibility_off, color: Colors.grey);
+        return Image.asset(
+          'visualblur.jpg',
+          width: 80,
+          height: 80,
+          fit: BoxFit.contain,
+        );
       case "Itching":
-        return Icon(Icons.pest_control, color: Colors.greenAccent);
+        return Image.asset(
+          'itching.jpg',
+          width: 80,
+          height: 80,
+          fit: BoxFit.contain,
+        );
       case "Irritability":
-        return Icon(Icons.sentiment_very_dissatisfied, color: Colors.yellowAccent);
+        return Image.asset(
+          'irritate.jpg',
+          width: 60,
+          height: 60,
+          fit: BoxFit.contain,
+        );
       case "Delayed Healing":
-        return Icon(Icons.healing, color: Colors.teal);
+        return Image.asset(
+          'delayed_healing.jpg',
+          width: 80,
+          height: 80,
+          fit: BoxFit.contain,
+        );
       case "Partial Paresis":
-        return Icon(Icons.accessibility, color: Colors.blueAccent);
+        return Image.asset(
+          'partialparesis.jpg',
+          width: 80,
+          height: 80,
+          fit: BoxFit.contain,
+        );
       case "Muscle Stiffness":
-        return Icon(Icons.sports_handball, color: Colors.purpleAccent);
+        return Image.asset(
+          'muscle_stiffness.jpg',
+          width: 80,
+          height: 80,
+          fit: BoxFit.contain,
+        );
       case "Alopecia":
-        return Icon(Icons.face, color: Colors.black);
+        return Image.asset(
+          'hairloss.jpg',
+          width: 80,
+          height: 80,
+          fit: BoxFit.contain,
+        );
       case "Obesity":
-        return Icon(Icons.fitness_center, color: Colors.redAccent);
+        return Image.asset(
+          'obesity.jpg',
+          width: 80,
+          height: 80,
+          fit: BoxFit.contain,
+        );
       default:
-        return Icon(Icons.help, color: Colors.grey);
+        return Icon(
+        Icons.help,
+        color: Colors.grey.withOpacity(0.05),  // Adjust opacity here
+);
+
     }
   }
 }

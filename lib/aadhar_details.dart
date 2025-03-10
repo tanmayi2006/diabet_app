@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart'; 
 import 'user_details.dart';
 import 'services/backend_service.dart';
 
@@ -29,7 +29,13 @@ class _AadharSearchPageState extends State<AadharSearchPage> {
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error fetching users: $e')),
+        SnackBar(
+          content: Text(
+            'Error fetching users: $e',
+            style: TextStyle(color: Colors.black),
+          ),
+          backgroundColor: Colors.white,
+        ),
       );
     }
   }
@@ -39,7 +45,6 @@ class _AadharSearchPageState extends State<AadharSearchPage> {
     setState(() {
       _filteredUsers = _allUsers
           .where((user) {
-            // Safely handle null original_aadhaar_number
             final aadhar = user['original_aadhaar_number'] as String? ?? '';
             return aadhar.toLowerCase().contains(query);
           })
@@ -57,46 +62,42 @@ class _AadharSearchPageState extends State<AadharSearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blueGrey.shade200, // or any color you find appealing
-        title: Text('Aadhar Search'),
+        backgroundColor: Colors.deepPurpleAccent,
+        title: Text(
+          'Aadhar Search',
+          style: TextStyle(color: Colors.black),
+        ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.purple.shade700, Colors.blue.shade900],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
+        color: Colors.white,
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.only(top: 20, right: 80),
-              child: Align(
-                alignment: Alignment.topRight,
-                child: Container(
-                  width: 250,
-                  child: TextField(
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      hintText: "Search Aadhar Number",
-                      filled: true,
-                      fillColor: Colors.white.withOpacity(0.2),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide.none,
-                      ),
-                      prefixIcon: Icon(
-                        Icons.search,
-                        color: Colors.white,
-                      ),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              child: SizedBox(
+                width: double.infinity, // Expands the search bar fully
+                child: TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: "Search Aadhar Number",
+                    hintStyle: TextStyle(color: Colors.black54),
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(color: Colors.black),
                     ),
-                    style: TextStyle(color: Colors.white),
+                    prefixIcon: Icon(
+                      Icons.search,
+                      color: Colors.black,
+                    ),
                   ),
+                  style: TextStyle(color: Colors.black),
                 ),
               ),
             ),
@@ -118,18 +119,24 @@ class _AadharSearchPageState extends State<AadharSearchPage> {
                         );
                       },
                       child: Card(
-                        color: Colors.white.withOpacity(0.1),
+                        color: Colors.white,
                         margin: EdgeInsets.symmetric(vertical: 8),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
+                          side: BorderSide(color: Colors.black),
                         ),
                         child: Padding(
-                          padding: const EdgeInsets.all(12.0),
+                          padding: const EdgeInsets.all(10.0),
+                              child: Padding(
+                          padding: const EdgeInsets.all(8.0),
                           child: Text(
                             _filteredUsers[index]['original_aadhaar_number'] as String? ?? 'N/A',
                             style: TextStyle(
                               fontSize: 18,
-                              color: Colors.white,
+                              color: Colors.black, // Text inside card in black
+                              fontWeight: FontWeight.bold,
+                            
+                              ),
                             ),
                           ),
                         ),
