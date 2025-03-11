@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:pie_chart/pie_chart.dart';
-import 'services/ml_service.dart'; // Adjust the import path based on your structure
-
+import 'services/ml_service.dart';
+import 'services/database_helper.dart'; // Import DatabaseHelper
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+import 'glucose_check.dart';
 class DiabetesPredictionPage extends StatefulWidget {
   final Map<String, dynamic> clinicalData;
 
@@ -13,7 +18,8 @@ class DiabetesPredictionPage extends StatefulWidget {
 
 class _DiabetesPredictionPageState extends State<DiabetesPredictionPage> {
   bool _isLoading = true;
-  final MlService _mlService = MlService(); // Assuming renamed from BackendService
+  final MlService _mlService = MlService();
+  final DatabaseHelper _dbHelper = DatabaseHelper(); // Instantiate DatabaseHelper
 
   @override
   void initState() {
@@ -23,12 +29,61 @@ class _DiabetesPredictionPageState extends State<DiabetesPredictionPage> {
 
   Future<void> _loadData() async {
     try {
-      await _mlService.loadModelAndRun(widget.clinicalData);
+      // Extract Aadhaar separately
+      String aadhaar = widget.clinicalData['Aadhaar'] as String;
+      Map<String, dynamic> clinicalDataWithoutAadhaar = Map.from(widget.clinicalData)..remove('Aadhaar');
+
+      // Pass only clinical data to MlService
+      await _mlService.loadModelAndRun(clinicalDataWithoutAadhaar);
+      double? prediction = _mlService.getPrediction();
+      Map<String, dynamic>? explanation = _mlService.getExplanation();
+
+      // Save to database with Aadhaar and timestamp
+      await _dbHelper.insertReport(aadhaar, prediction, explanation ?? {});
       setState(() => _isLoading = false);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Error: $e")));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error loading prediction: $e")),
+      );
       setState(() => _isLoading = false);
     }
+  }
+Future<void> _downloadReport() async {
+    final pdf = pw.Document();
+    final explanation = _mlService.getExplanation() ?? {};
+
+    pdf.addPage(
+      pw.Page(
+        build: (pw.Context context) {
+          return pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Text("Diabetes Risk Report", style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold)),
+              pw.SizedBox(height: 10),
+              pw.Text("Risk Level: ${explanation['risk_level'] ?? 'Unknown'}", style: pw.TextStyle(fontSize: 18)),
+              pw.SizedBox(height: 10),
+              pw.Text("Suggestions:", style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
+              pw.Column(
+                children: (explanation['suggestions'] as List?)?.map((s) => pw.Text("- $s"))?.toList() ?? [],
+              ),
+              pw.SizedBox(height: 10),
+              pw.Text("Clinical Details:", style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold)),
+              pw.Column(
+                children: (explanation['clinical_details'] as List?)?.map((c) => pw.Text("- $c"))?.toList() ?? [],
+              ),
+            ],
+          );
+        },
+      ),
+    );
+
+    final directory = await getApplicationDocumentsDirectory();
+    final file = File("${directory.path}/Diabetes_Report.pdf");
+    await file.writeAsBytes(await pdf.save());
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Report saved: ${file.path}")),
+    );
   }
 
   @override
@@ -54,7 +109,21 @@ class _DiabetesPredictionPageState extends State<DiabetesPredictionPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Diabetes Risk Assessment"),
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: Colors.purple,
+          actions: [
+    IconButton(
+      icon: const Icon(Icons.flag, color: Colors.red),
+      tooltip: "Report False Prediction",
+      onPressed: () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("False prediction reported."),
+            backgroundColor: Colors.red,
+          ),
+        );
+      },
+    ),
+  ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -103,6 +172,11 @@ class _DiabetesPredictionPageState extends State<DiabetesPredictionPage> {
                             "Risk Level: ${_mlService.getExplanation()?['risk_level'] ?? 'Unknown'}",
                             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                           ),
+                          if (_mlService.getExplanation()?['risk_level'] == 'Unknown')
+                            const Text(
+                              "Please provide more clinical data for an accurate assessment.",
+                              style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic),
+                            ),
                         ],
                       ),
                     ),
@@ -235,9 +309,36 @@ class _DiabetesPredictionPageState extends State<DiabetesPredictionPage> {
                       "Summary: ${_mlService.getExplanation()!['summary']}",
                       style: const TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
                     ),
+                    const SizedBox(height: 20),
+                  ElevatedButton(
+  onPressed: _downloadReport,
+  style: ElevatedButton.styleFrom(
+    backgroundColor: Colors.purple, // Purple background
+    foregroundColor: Colors.white, // White text
+    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12), // Padding
+    textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold), // Text styling
+  ),
+  child: const Text("Download Report"),
+),
+ElevatedButton(
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => GlucoseCheckPage()),
+        );
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.blue, // Blue background
+        foregroundColor: Colors.white, // White text
+      ),
+      child: const Text("Check Glucose"),
+    ),
+
                 ],
               ),
             ),
+            
     );
+   
   }
 }

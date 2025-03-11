@@ -23,6 +23,8 @@ dependencies:
   tflite_flutter: ^0.10.4
   pie_chart: ^5.4.0
   path_provider: ^2.1.1
+  pdf: ^3.10.7
+  
   
   
 

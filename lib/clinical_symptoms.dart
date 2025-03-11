@@ -9,6 +9,7 @@ class ClinicalDataPage extends StatefulWidget {
 class _ClinicalDataPageState extends State<ClinicalDataPage> {
   int? age;
   String? gender;
+  String? aadhaarNumber; // New field for Aadhaar
   Map<String, bool> symptoms = {
     "Polyuria": false,
     "Polydipsia": false,
@@ -40,6 +41,19 @@ class _ClinicalDataPageState extends State<ClinicalDataPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Text("Enter Aadhaar Number:", style: _labelStyle()),
+              TextField(
+                keyboardType: TextInputType.number,
+                maxLength: 12, // Aadhaar is 12 digits
+                style: TextStyle(color: Colors.black),
+                decoration: _inputDecoration("Aadhaar Number (12 digits)"),
+                onChanged: (value) {
+                  setState(() {
+                    aadhaarNumber = value;
+                  });
+                },
+              ),
+              SizedBox(height: 16),
               Text("Enter Age:", style: _labelStyle()),
               TextField(
                 keyboardType: TextInputType.number,
@@ -103,14 +117,20 @@ class _ClinicalDataPageState extends State<ClinicalDataPage> {
               Center(
                 child: ElevatedButton(
                   onPressed: () {
+                    if (aadhaarNumber == null || aadhaarNumber!.length != 12) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Please enter a valid 12-digit Aadhaar number')),
+                      );
+                      return;
+                    }
                     if (age == null || gender == null) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Please enter age and select gender')),
                       );
                       return;
                     }
-                    // Prepare data to pass
                     Map<String, dynamic> clinicalData = {
+                      'Aadhaar': aadhaarNumber, // Include Aadhaar
                       'Age': age!,
                       'Gender': gender == 'Male' ? 1 : 0,
                       ...symptoms.map((key, value) => MapEntry(key, value ? 1 : 0)),
@@ -145,7 +165,6 @@ class _ClinicalDataPageState extends State<ClinicalDataPage> {
       ),
     );
   }
-
   Widget _genderRadio(String value) {
     return Row(
       mainAxisSize: MainAxisSize.min,
